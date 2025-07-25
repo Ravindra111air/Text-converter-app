@@ -16,10 +16,9 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* Custom styles for a vintage, sepia-toned theme */
         body {
-            font-family: 'Special Elite', cursive; /* Vintage typewriter font */
-            background-color: #fdf6e3; /* Softer, parchment-like background */
+            font-family: 'Special Elite', cursive;
+            background-color: #fdf6e3;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -29,97 +28,47 @@
             background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
             background-size: 5px 5px;
         }
-
-        /* Styling for the main container to look like a vintage card */
         .container {
-            background-color: #fbf1c7; /* Creamy yellow, like aged paper */
+            background-color: #fbf1c7;
             border-radius: 15px;
-            border: 2px solid #d3c0a5; /* Soft brown border */
+            border: 2px solid #d3c0a5;
             box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.1);
         }
-
-        /* Styling for the textarea to blend with the theme */
         textarea, select {
             resize: vertical;
             min-height: 250px;
-            background-color: #fdf6e3; /* Match body for a seamless look */
-            border: 1px dashed #bdae93; /* Dashed border for a notebook feel */
-            color: #665c54; /* Dark, soft brown for text */
+            background-color: #fdf6e3;
+            border: 1px dashed #bdae93;
+            color: #665c54;
             font-size: 1.1rem;
             line-height: 1.8;
         }
-
         select {
-            min-height: auto; /* Override textarea min-height for select */
+            min-height: auto;
         }
-
         textarea:focus, select:focus {
             outline: none;
-            border: 1px solid #928374; /* A slightly darker border on focus */
+            border: 1px solid #928374;
             box-shadow: 0 0 10px rgba(189, 174, 147, 0.5);
         }
-
-        /* Button base styling with enhanced animations */
-        .btn {
-            @apply px-8 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 ease-in-out;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            will-change: transform; /* Optimization for animations */
-        }
-
-        .btn-primary {
-            @apply bg-gradient-to-br from-amber-800 to-amber-950 text-white border-2 border-amber-900;
-        }
-
-        .btn-secondary {
-            @apply bg-gradient-to-br from-amber-300 to-amber-500 text-amber-900 border-2 border-amber-600;
-        }
-
-        .btn-tertiary {
-            @apply bg-gradient-to-br from-green-700 to-green-900 text-white border-2 border-green-900;
-        }
-        
-        /* Advanced button animations */
-        .btn:hover {
-            transform: translateY(-5px) scale(1.05); /* Lifts the button up */
-            box-shadow: 0 15px 25px rgba(0,0,0,0.2);
-        }
-        
-        .btn:active {
-            transform: translateY(1px) scale(0.95); /* Pushes the button down */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        /* Styling for the message box for better visibility */
         .message-success {
-            @apply bg-green-100 text-green-900 border border-green-300;
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
         }
-
         .message-error {
-            @apply bg-red-100 text-red-900 border border-red-300;
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
         }
-        
-        /* Title styling for a more prominent look */
         h1 {
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
-
-        /* Tab styling */
         .tabs {
             display: flex;
             border-bottom: 2px solid #d3c0a5;
             margin-bottom: 1rem;
-            gap: 1rem; /* This adds space between the tab buttons */
-        }
-        .tab-button {
-            @apply px-6 py-3 font-semibold text-lg cursor-pointer transition-all duration-300;
-            border: none;
-            background-color: transparent;
-            color: #928374;
-        }
-        .tab-button.active {
-            color: #665c54;
-            border-bottom: 3px solid #665c54;
+            gap: 1rem;
         }
         .tab-content {
             display: none;
@@ -162,19 +111,18 @@
             color: #928374;
         }
         #content table {
-          border-collapse: collapse;
-          width: 100%;
-          margin-top: 1em;
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 1em;
         }
         #content th, #content td {
-          border: 1px solid #d3c0a5;
-          padding: 8px;
-          text-align: left;
+            border: 1px solid #d3c0a5;
+            padding: 8px;
+            text-align: left;
         }
         #content th {
-          background-color: #fbf1c7;
+            background-color: #fbf1c7;
         }
-
     </style>
 </head>
 <body>
@@ -185,8 +133,8 @@
         </header>
 
         <div class="tabs">
-            <button class="tab-button active" data-tab="text-export">Text Export</button>
-            <button class="tab-button" data-tab="markdown-converter">Markdown Converter</button>
+            <button class="px-6 py-3 font-semibold text-lg cursor-pointer transition-all duration-300 text-amber-800 border-0 border-b-4 border-amber-800 bg-transparent focus:outline-none tab-button active" data-tab="text-export">Text Export</button>
+            <button class="px-6 py-3 font-semibold text-lg cursor-pointer transition-all duration-300 text-amber-800 border-0 bg-transparent focus:outline-none tab-button" data-tab="markdown-converter">Markdown Converter</button>
         </div>
 
         <main>
@@ -200,16 +148,18 @@
                     ></textarea>
                 </div>
 
-                <!-- Original Export Options -->
                 <div class="p-6 bg-amber-200/50 border-t-2 border-b-2 border-dashed border-amber-300 rounded-lg shadow-inner mb-6">
                     <h2 class="text-2xl font-semibold text-amber-800 mb-5 text-center">Standard Export Options</h2>
                     <div class="flex flex-col sm:flex-row justify-center items-center space-y-5 sm:space-y-0 sm:space-x-6">
-                        <button id="exportTxtBtn" class="btn btn-primary">Export as TXT</button>
-                        <button id="exportCsvBtn" class="btn btn-secondary">Export as CSV</button>
+                        <button id="exportTxtBtn"
+                          class="px-8 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 ease-in-out bg-gradient-to-br from-amber-800 to-amber-950 text-white border-2 border-amber-900 uppercase tracking-wider hover:-translate-y-1 hover:scale-105 hover:shadow-2xl active:translate-y-0.5 active:scale-95"
+                        >Export as TXT</button>
+                        <button id="exportCsvBtn"
+                          class="px-8 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 ease-in-out bg-gradient-to-br from-amber-300 to-amber-500 text-amber-900 border-2 border-amber-600 uppercase tracking-wider hover:-translate-y-1 hover:scale-105 hover:shadow-2xl active:translate-y-0.5 active:scale-95"
+                        >Export as CSV</button>
                     </div>
                 </div>
 
-                <!-- New Division Options -->
                 <div class="p-6 bg-green-200/30 border-t-2 border-b-2 border-dashed border-green-300 rounded-lg shadow-inner mb-6">
                     <h2 class="text-2xl font-semibold text-green-800 mb-5 text-center">Division Options</h2>
                     <div class="flex flex-col sm:flex-row justify-center items-center space-y-5 sm:space-y-0 sm:space-x-6">
@@ -227,9 +177,11 @@
                                 <option value="9">9</option>
                                 <option value="10">10</option>
                             </select>
-                             <label for="divisionCount" class="text-green-900 font-semibold">Parts</label>
+                            <label for="divisionCount" class="text-green-900 font-semibold">Parts</label>
                         </div>
-                        <button id="divideAndExportBtn" class="btn btn-tertiary">Divide & Export TXT Parts</button>
+                        <button id="divideAndExportBtn"
+                          class="px-8 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 ease-in-out bg-gradient-to-br from-green-700 to-green-900 text-white border-2 border-green-900 uppercase tracking-wider hover:-translate-y-1 hover:scale-105 hover:shadow-2xl active:translate-y-0.5 active:scale-95"
+                        >Divide & Export TXT Parts</button>
                     </div>
                 </div>
             </div>
@@ -237,9 +189,15 @@
             <div id="markdown-converter" class="tab-content">
                 <div id="controls" class="mb-6 flex flex-col sm:flex-row justify-center items-center space-y-5 sm:space-y-0 sm:space-x-6">
                     <input type="file" id="markdown-input" accept=".md, .markdown">
-                    <button id="import-markdown" class="btn btn-primary">Import Markdown</button>
-                    <button id="export-pdf" class="btn btn-secondary">Export to PDF</button>
-                    <button id="copy-html" class="btn btn-tertiary">Copy for Google Docs</button>
+                    <button id="import-markdown"
+                      class="px-8 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 ease-in-out bg-gradient-to-br from-amber-800 to-amber-950 text-white border-2 border-amber-900 uppercase tracking-wider hover:-translate-y-1 hover:scale-105 hover:shadow-2xl active:translate-y-0.5 active:scale-95"
+                    >Import Markdown</button>
+                    <button id="export-pdf"
+                      class="px-8 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 ease-in-out bg-gradient-to-br from-amber-300 to-amber-500 text-amber-900 border-2 border-amber-600 uppercase tracking-wider hover:-translate-y-1 hover:scale-105 hover:shadow-2xl active:translate-y-0.5 active:scale-95"
+                    >Export to PDF</button>
+                    <button id="copy-html"
+                      class="px-8 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 ease-in-out bg-gradient-to-br from-green-700 to-green-900 text-white border-2 border-green-900 uppercase tracking-wider hover:-translate-y-1 hover:scale-105 hover:shadow-2xl active:translate-y-0.5 active:scale-95"
+                    >Copy for Google Docs</button>
                 </div>
                 <div id="content" class="prose">
                     <p>Import a Markdown file to see its content here.</p>
