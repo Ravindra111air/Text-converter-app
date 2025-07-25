@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Export Utility</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tone.js CDN for sound effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <!-- Google Fonts for a more stylish, typewriter-esque font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+    <!-- JavaScript Libraries for Markdown to PDF -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* Custom styles for a vintage, sepia-toned theme */
+        body {
+            font-family: 'Special Elite', cursive; /* Vintage typewriter font */
+            background-color: #fdf6e3; /* Softer, parchment-like background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+            background-size: 5px 5px;
+        }
+
+        /* Styling for the main container to look like a vintage card */
+        .container {
+            background-color: #fbf1c7; /* Creamy yellow, like aged paper */
+            border-radius: 15px;
+            border: 2px solid #d3c0a5; /* Soft brown border */
+            box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Styling for the textarea to blend with the theme */
+        textarea, select {
+            resize: vertical;
+            min-height: 250px;
+            background-color: #fdf6e3; /* Match body for a seamless look */
+            border: 1px dashed #bdae93; /* Dashed border for a notebook feel */
+            color: #665c54; /* Dark, soft brown for text */
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        select {
+            min-height: auto; /* Override textarea min-height for select */
+        }
+
+        textarea:focus, select:focus {
+            outline: none;
+            border: 1px solid #928374; /* A slightly darker border on focus */
+            box-shadow: 0 0 10px rgba(189, 174, 147, 0.5);
+        }
+
+        /* Button base styling with enhanced animations */
+        .btn {
+            @apply px-8 py-4 rounded-lg font-semibold shadow-lg transition-all duration-300 ease-in-out;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            will-change: transform; /* Optimization for animations */
+        }
+
+        .btn-primary {
+            @apply bg-gradient-to-br from-amber-800 to-amber-950 text-white border-2 border-amber-900;
+        }
+
+        .btn-secondary {
+            @apply bg-gradient-to-br from-amber-300 to-amber-500 text-amber-900 border-2 border-amber-600;
+        }
+
+        .btn-tertiary {
+            @apply bg-gradient-to-br from-green-700 to-green-900 text-white border-2 border-green-900;
+        }
+        
+        /* Advanced button animations */
+        .btn:hover {
+            transform: translateY(-5px) scale(1.05); /* Lifts the button up */
+            box-shadow: 0 15px 25px rgba(0,0,0,0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(1px) scale(0.95); /* Pushes the button down */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Styling for the message box for better visibility */
+        .message-success {
+            @apply bg-green-100 text-green-900 border border-green-300;
+        }
+
+        .message-error {
+            @apply bg-red-100 text-red-900 border border-red-300;
+        }
+        
+        /* Title styling for a more prominent look */
+        h1 {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Tab styling */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #d3c0a5;
+            margin-bottom: 1rem;
+            gap: 1rem; /* This adds space between the tab buttons */
+        }
+        .tab-button {
+            @apply px-6 py-3 font-semibold text-lg cursor-pointer transition-all duration-300;
+            border: none;
+            background-color: transparent;
+            color: #928374;
+        }
+        .tab-button.active {
+            color: #665c54;
+            border-bottom: 3px solid #665c54;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        #markdown-input {
+            display: none;
+        }
+        #content {
+            border: 1px dashed #bdae93;
+            padding: 1.5em;
+            min-height: 200px;
+            background: #fdf6e3;
+            border-radius: 5px;
+            line-height: 1.6;
+            color: #665c54;
+        }
+        #content h1, #content h2, #content h3 {
+            border-bottom: 1px solid #d3c0a5;
+            padding-bottom: 0.3em;
+            margin-top: 1.5em;
+        }
+        #content code {
+            background-color: #fbf1c7;
+            border-radius: 3px;
+            padding: 0.2em 0.4em;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+        #content pre {
+            background-color: #fbf1c7;
+            padding: 1em;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        #content blockquote {
+            border-left: 0.25em solid #d3c0a5;
+            padding: 0 1em;
+            color: #928374;
+        }
+        #content table {
+          border-collapse: collapse;
+          width: 100%;
+          margin-top: 1em;
+        }
+        #content th, #content td {
+          border: 1px solid #d3c0a5;
+          padding: 8px;
+          text-align: left;
+        }
+        #content th {
+          background-color: #fbf1c7;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container mx-auto p-8 w-full max-w-3xl">
+        <header class="text-center mb-8">
+            <h1 class="text-5xl font-bold text-amber-900">Text & Markdown Utility</h1>
+            <p class="text-amber-800 text-lg mt-2">Your all-in-one text processing tool</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="text-export">Text Export</button>
+            <button class="tab-button" data-tab="markdown-converter">Markdown Converter</button>
+        </div>
+
+        <main>
+            <div id="text-export" class="tab-content active">
+                <div class="mb-8">
+                    <label for="plainText" class="block text-amber-800 text-xl font-medium mb-3">Paste your plain text here:</label>
+                    <textarea
+                        id="plainText"
+                        class="w-full p-5 rounded-lg focus:ring-0 focus:border-amber-600 text-base placeholder-amber-600/70"
+                        placeholder="Your thoughts, notes, or data..."
+                    ></textarea>
+                </div>
+
+                <!-- Original Export Options -->
+                <div class="p-6 bg-amber-200/50 border-t-2 border-b-2 border-dashed border-amber-300 rounded-lg shadow-inner mb-6">
+                    <h2 class="text-2xl font-semibold text-amber-800 mb-5 text-center">Standard Export Options</h2>
+                    <div class="flex flex-col sm:flex-row justify-center items-center space-y-5 sm:space-y-0 sm:space-x-6">
+                        <button id="exportTxtBtn" class="btn btn-primary">Export as TXT</button>
+                        <button id="exportCsvBtn" class="btn btn-secondary">Export as CSV</button>
+                    </div>
+                </div>
+
+                <!-- New Division Options -->
+                <div class="p-6 bg-green-200/30 border-t-2 border-b-2 border-dashed border-green-300 rounded-lg shadow-inner mb-6">
+                    <h2 class="text-2xl font-semibold text-green-800 mb-5 text-center">Division Options</h2>
+                    <div class="flex flex-col sm:flex-row justify-center items-center space-y-5 sm:space-y-0 sm:space-x-6">
+                        <div class="flex items-center space-x-3">
+                            <label for="divisionCount" class="text-green-900 font-semibold">Divide into:</label>
+                            <select id="divisionCount" class="rounded-lg p-3 w-24 text-center border-green-700 focus:ring-0">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5" selected>5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select>
+                             <label for="divisionCount" class="text-green-900 font-semibold">Parts</label>
+                        </div>
+                        <button id="divideAndExportBtn" class="btn btn-tertiary">Divide & Export TXT Parts</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="markdown-converter" class="tab-content">
+                <div id="controls" class="mb-6 flex flex-col sm:flex-row justify-center items-center space-y-5 sm:space-y-0 sm:space-x-6">
+                    <input type="file" id="markdown-input" accept=".md, .markdown">
+                    <button id="import-markdown" class="btn btn-primary">Import Markdown</button>
+                    <button id="export-pdf" class="btn btn-secondary">Export to PDF</button>
+                    <button id="copy-html" class="btn btn-tertiary">Copy for Google Docs</button>
+                </div>
+                <div id="content" class="prose">
+                    <p>Import a Markdown file to see its content here.</p>
+                </div>
+            </div>
+
+            <div id="messageBox" class="mt-6 p-4 rounded-lg text-center font-semibold text-base hidden transition-all duration-300"></div>
+        </main>
+    </div>
+
+    <script>
+        // --- Tab Functionality ---
+        const tabs = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = document.getElementById(tab.dataset.tab);
+
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                tabs.forEach(t => {
+                    t.classList.remove('active');
+                });
+
+                target.classList.add('active');
+                tab.classList.add('active');
+            });
+        });
+
+        // --- Text Export Utility ---
+        const plainTextarea = document.getElementById('plainText');
+        const exportTxtButton = document.getElementById('exportTxtBtn');
+        const exportCsvButton = document.getElementById('exportCsvBtn');
+        const divideAndExportButton = document.getElementById('divideAndExportBtn');
+        const divisionCountSelect = document.getElementById('divisionCount');
+        const messageBox = document.getElementById('messageBox');
+
+        const synth = new Tone.Synth().toDestination();
+
+        function playClickSound() {
+            if (Tone.context.state !== 'running') {
+                Tone.start();
+            }
+            synth.triggerAttackRelease("C4", "8n");
+        }
+
+        function showMessage(message, type) {
+            messageBox.textContent = message;
+            messageBox.className = 'mt-6 p-4 rounded-lg text-center font-semibold text-base transition-all duration-300';
+            if (type === 'success') {
+                messageBox.classList.add('message-success');
+            } else if (type === 'error') {
+                messageBox.classList.add('message-error');
+            }
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 3000);
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            try {
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error during file download:', error);
+                showMessage(`Failed to export ${filename}. Please try again.`, 'error');
+            }
+        }
+
+        exportTxtButton.addEventListener('click', () => {
+            playClickSound();
+            const textContent = plainTextarea.value;
+            if (textContent.trim() === '') {
+                showMessage('Please enter some text to export as TXT.', 'error');
+                return;
+            }
+            downloadFile(textContent, 'my_text_document.txt', 'text/plain');
+            showMessage('Successfully exported as my_text_document.txt!', 'success');
+        });
+
+        exportCsvButton.addEventListener('click', () => {
+            playClickSound();
+            const textContent = plainTextarea.value;
+            if (textContent.trim() === '') {
+                showMessage('Please enter some text to export as CSV.', 'error');
+                return;
+            }
+            downloadFile(textContent, 'my_data_document.csv', 'text/csv');
+            showMessage('Successfully exported as my_data_document.csv!', 'success');
+        });
+
+        divideAndExportButton.addEventListener('click', () => {
+            playClickSound();
+            const textContent = plainTextarea.value;
+            const numDivisions = parseInt(divisionCountSelect.value, 10);
+            if (textContent.trim() === '') {
+                showMessage('Please enter some text to divide and export.', 'error');
+                return;
+            }
+            if (numDivisions <= 0) {
+                showMessage('Number of divisions must be at least 1.', 'error');
+                return;
+            }
+            const totalLength = textContent.length;
+            const partLength = Math.ceil(totalLength / numDivisions);
+            let startIndex = 0;
+            for (let i = 1; i <= numDivisions; i++) {
+                const endIndex = startIndex + partLength;
+                const textPart = textContent.substring(startIndex, endIndex);
+                if(textPart.length > 0) {
+                    const filename = `my_text_part_${i}_of_${numDivisions}.txt`;
+                    setTimeout(() => {
+                        downloadFile(textPart, filename, 'text/plain');
+                    }, i * 250);
+                }
+                startIndex = endIndex;
+            }
+            showMessage(`Exporting text in ${numDivisions} parts...`, 'success');
+        });
+
+        // --- Markdown Converter ---
+        const contentDiv = document.getElementById('content');
+        const copyButton = document.getElementById('copy-html');
+        const markdownInput = document.getElementById('markdown-input');
+        const importMarkdownButton = document.getElementById('import-markdown');
+
+        importMarkdownButton.addEventListener('click', () => markdownInput.click());
+
+        markdownInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    contentDiv.innerHTML = marked.parse(content);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        document.getElementById('export-pdf').addEventListener('click', function() {
+            const opt = {
+              margin:       1,
+              filename:     'document.pdf',
+              image:        { type: 'jpeg', quality: 0.98 },
+              html2canvas:  { scale: 2 },
+              jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(contentDiv).save();
+        });
+
+        copyButton.addEventListener('click', function() {
+            const htmlContent = contentDiv.innerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const clipboardItem = new ClipboardItem({ 'text/html': blob });
+
+            navigator.clipboard.write([clipboardItem]).then(() => {
+                showMessage('Copied to clipboard!', 'success');
+            }).catch(err => {
+                console.error('Failed to copy HTML content: ', err);
+                showMessage('Failed to copy content. Your browser might not support this feature.', 'error');
+            });
+        });
+    </script>
+</body>
+</html>
